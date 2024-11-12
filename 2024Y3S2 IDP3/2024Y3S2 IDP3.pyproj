@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a72b7ef4-194c-40c3-92b1-ac6f3e197b9f</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>_2024Y3S2_IDP3.py</StartupFile>
+    <StartupFile>MainSystem.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,7 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="_2024Y3S2_IDP3.py" />
+    <Compile Include="MainSystem.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|VisualStudio|Python3.12" />
