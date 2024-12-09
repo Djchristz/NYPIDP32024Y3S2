@@ -149,7 +149,7 @@ def conveyor():
     #Rainier AI scan 
     #Another need to wait for Rainier part
     irscanning()
-    if irscanning():
+    if scan_rejected:
         state = 4
     else:
         state = 1
