@@ -43,7 +43,7 @@ ultrasonic_trigger = 1 #Pins
 ultrasonic_echo = 2
 
 GPIO.setup(ultrasonic_trigger, GPIO.OUT)
-GPIO.setup(ultrasonic_echo, GPIO.IN)er 
+GPIO.setup(ultrasonic_echo, GPIO.IN)
 
 irsens = read_adc(0)
 irreadings = []
@@ -67,30 +67,28 @@ def read_adc(channel):  # MCP3008 ADC Protocol
 
 def irscanning():
     m1f(0.1)
-    m1s()
     irreadings.append(irsens)
 
     if len(irreadings) > 2:
+        # Trim the first and last readings
         trimmed_readings = irreadings[1:-1]
 
         contaminated = False
+        # Check for contamination in the trimmed readings
         for i in range(1, len(trimmed_readings) - 1):
             if abs(trimmed_readings[i] - trimmed_readings[i-1]) > 100 or abs(trimmed_readings[i] - trimmed_readings[i+1]) > 100:
                 contaminated = True
-                break  # No need to check further if contamination is detected
+                break
 
+        # Handle contamination or acceptance
         if contaminated:
             scan_rejected = True
-            scan_accepted = False
-            state = 4
             print("Contamination detected. Recyclable rejected.")
         else:
             scan_rejected = False
-            scan_accepted = True
-            state = 1
             print("No contamination. Recyclable accepted.")
-
         print("Processed readings (after trimming):", trimmed_readings)
+        return scan_rejected
     else:
         print("Not enough data to process.")
     time.sleep(0.1)
@@ -151,11 +149,15 @@ def conveyor():
     #Rainier AI scan 
     #Another need to wait for Rainier part
     irscanning()
+    if irscanning():
+        state = 4
+    else:
+        state = 1
 
 #Conveyor Logic End
 
 #ultrasonic logic
-def measure_distance():
+def ultrasonicbutton():
     # Send a 10us pulse to the trigger
     GPIO.output(ultrasonic_trigger, GPIO.LOW)
     time.sleep(0.1)  # Delay to stabilize
@@ -174,35 +176,6 @@ def measure_distance():
     pulse_duration = pulse_end - pulse_start
     distance = (pulse_duration * 34300) / 2  # Divide by 2 for round trip
     return distance
-
-def handle_states(threshold_distance):
-
-    distance = measure_distance()
-    hand_detected = distance < threshold_distance
-
-    # State Logic
-    if state == 1:
-        if hand_detected:
-            print("Hand detected. Preparing to open door.")
-            time.sleep(0.5)  # Simulate delay for hand detection
-            state = 2  # Move to State 2
-    elif state == 2:
-        print("Door opening...")  # Placeholder for door opening logic
-        m2f(2)
-        time.sleep(15)  # Simulate 10-second door open time
-        print("Door closing...")
-        m2r(2)
-        state = 3  # Move to State 3
-    elif state == 3:
-        conveyor()
-    elif state == 4:
-        print("Door opening...")  # Placeholder for door opening logic
-        m2f(2)
-        m1r(4)
-        time.sleep(10)  # Simulate 10-second door open time
-        print("Door closing...")
-        m2r(2)
-        state = 1
 
 #ultrasonic logic end
 
